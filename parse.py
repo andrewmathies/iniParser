@@ -1,12 +1,8 @@
-import enum
 import re
-
-class DataType(enum.Enum):
-    MODEL = 1
-    ADDRESS = 2
-    RELAY = 3
+from datatype import DataType
 
 def insert(map, dataType, tokens):
+    # validate no path in tokens
     if '\\' in tokens[2]:
         return
 
@@ -15,8 +11,7 @@ def insert(map, dataType, tokens):
     elif dataType == DataType.RELAY:
         cavity = tokens[0][5:6]
         relay = tokens[0][7:]
-
-        map[tokens[2]] = (cavity, relay)
+        map[cavity + relay] = tokens[2]
     else:
         raise Exception('unknown data type:', dataType)
 
