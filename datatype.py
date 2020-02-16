@@ -1,6 +1,6 @@
 import enum
 
 class DataType(enum.Enum):
-    MODEL = 1
-    ADDRESS = 2
-    RELAY = 3
+    MODEL = 'model'
+    ADDRESS = 'address'
+    RELAY = 'relay'
