@@ -27,33 +27,33 @@ class db():
     def buildTables(self):
         commands = (
             """
-            create table appliance (
+            create table if not exists appliance (
                 id serial primary key,
                 type varchar(20) not null
             )
             """,
             """
-            create table ui_type (
+            create table if not exists ui_type (
                 id serial primary key,
                 type varchar(20) not null
             )
             """,
             """
-            create table cooktop_type (
+            create table if not exists cooktop_type (
                 id serial primary key,
                 type varchar(20) not null
             )
             """,
             """
-            create table model (
+            create table if not exists model (
                 id serial primary key,
                 modelname varchar(30) not null,
-                foreign key (appliancetype)
+                appliancetype integer
                     references appliance (id),
-                foreign key (ovenui)
+                ovenui integer
                     references ui_type (id),
                 cooktoppresent boolean,
-                foreign key (cooktoptype)
+                cooktoptype integer
                     references cooktop_type (id),
                 double boolean,
                 mccount integer,
@@ -62,8 +62,8 @@ class db():
             )
             """,
             """
-            create table model_addresses (
-                foreign key (modelid)
+            create table if not exists address (
+                modelid integer
                     references model (id),
                 mc1address integer,
                 mc2address integer,
@@ -74,27 +74,27 @@ class db():
             )
             """,
             """
-            create table model_relays (
-                foreign key (modelid)
-                    references model (id)
-                1k902 varchar(20),
-                1k903 varchar(20),
-                1k905 varchar(20),
-                1k906 varchar(20),
-                1k909 varchar(20),
-                1k910 varchar(20),
-                1k915 varchar(20),
-                1k916 varchar(20),
-                1q701 varchar(20),
-                2k902 varchar(20),
-                2k903 varchar(20),
-                2k905 varchar(20),
-                2k906 varchar(20),
-                2k909 varchar(20),
-                2k910 varchar(20),
-                2k915 varchar(20),
-                2k916 varchar(20),
-                2q701 varchar(20)
+            create table if not exists relay (
+                modelid integer
+                    references model (id),
+                pk902 varchar(20),
+                pk903 varchar(20),
+                pk905 varchar(20),
+                pk906 varchar(20),
+                pk909 varchar(20),
+                pk910 varchar(20),
+                pk915 varchar(20),
+                pk916 varchar(20),
+                pq701 varchar(20),
+                sk902 varchar(20),
+                sk903 varchar(20),
+                sk905 varchar(20),
+                sk906 varchar(20),
+                sk909 varchar(20),
+                sk910 varchar(20),
+                sk915 varchar(20),
+                sk916 varchar(20),
+                sq701 varchar(20)
             )
             """)
 
@@ -102,26 +102,30 @@ class db():
             i = 0
 
             for command in commands:
-                logger.info('executing command ' + i)
+                logger.info('executing command ' + str(i))
                 i += 1
                 self.cur.execute(command)
+                self.conn.commit()
         
         except (Exception, pp.DatabaseError) as err:
             logger.error(err)
             self.conn.rollback()
             self.cur = self.conn.cursor()
-        else:
-            self.conn.commit()
 
     def insert(self, dataType, map):
         logger.info('creating entry in ' + dataType.value)
         
         keys = map.keys()
         cols = '(' + ', '.join(keys) + ')'
-        types = '(' + '%s, ' * (len(keys) - 1) + '%s)' 
-        self.cur.execute('insert into ' + dataType.value + ' ' + cols + ' VALUES ' + types, map.values)
+        types = '(' + '%s, ' * (len(keys) - 1) + '%s)'
 
-if __name__ == '__main__': 
+        data = tuple(map.values())
+        logger.info('inserting ' + str(map))
+
+        self.cur.execute('insert into ' + dataType.value + ' ' + cols + ' VALUES ' + types, data)
+        self.conn.commit()
+
+if __name__ == '__main__':
     test = db()
     test.buildTables()
 

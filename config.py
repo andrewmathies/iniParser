@@ -1,6 +1,6 @@
 dbConfig = {
-    'dbname': 'test',
-    'user': 'andrew',
+    'dbname': 'postgres',
+    'user': 'postgres',
     'password': '',
     'host': 'localhost',
     'port': '5432'
