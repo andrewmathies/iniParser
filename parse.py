@@ -9,9 +9,16 @@ def insert(map, dataType, tokens):
     if dataType == DataType.MODEL or dataType == DataType.ADDRESS:
         map[tokens[0]] = tokens[2]
     elif dataType == DataType.RELAY:
-        cavity = tokens[0][5:6]
+        cavity = int(tokens[0][5:6])
+        cavityString = ''
+
+        if cavity == 1:
+            cavityString = 'p'
+        else:
+            cavityString = 's'
+
         relay = tokens[0][7:]
-        map[cavity + relay] = tokens[2]
+        map[cavityString + relay] = tokens[2]
     else:
         raise Exception('unknown data type:', dataType)
 
