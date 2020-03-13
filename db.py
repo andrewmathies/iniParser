@@ -99,14 +99,11 @@ class db():
             """)
 
         try:
-            i = 0
-
             for command in commands:
-                logger.info('executing command ' + str(i))
-                i += 1
+                logger.info('executing command ' + command[:20])
                 self.cur.execute(command)
                 self.conn.commit()
-        
+
         except (Exception, pp.DatabaseError) as err:
             logger.error(err)
             self.conn.rollback()
@@ -115,6 +112,16 @@ class db():
     def insert(self, dataType, map):
         logger.info('creating entry in ' + dataType.value)
         
+        for key, val in map:
+            if key == 'ApplianceType':
+                self.cur.execute('select id from appliance where id=%s', (val))
+                applianceID = self.cur.fetchone()
+                if len(applianceID) == 0:
+                    self.cur.execute('insert into appliance (type) values (%s)', (val))
+
+
+
+
         keys = map.keys()
         cols = '(' + ', '.join(keys) + ')'
         types = '(' + '%s, ' * (len(keys) - 1) + '%s)'
@@ -122,7 +129,7 @@ class db():
         data = tuple(map.values())
         logger.info('inserting ' + str(map))
 
-        self.cur.execute('insert into ' + dataType.value + ' ' + cols + ' VALUES ' + types, data)
+        self.cur.execute('insert into ' + dataType.value + ' ' + cols + ' values ' + types, data)
         self.conn.commit()
 
 if __name__ == '__main__':
